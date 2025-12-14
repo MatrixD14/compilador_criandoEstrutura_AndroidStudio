@@ -21,13 +21,13 @@ aapt2 link -o "$FILE.apk.unaligned" --manifest AndroidManifest.xml -I $ANDROID_J
 cp dex/classes.dex .
 zip -u "$FILE.apk.unaligned" classes.dex
 
-##esse e o aapt antigo caso nao funcione o aapt2##
+##esse e o aapt antigo caso nao funcione o aapt2 desativa [aapt2,cp,zip]##
 ##aapt package -f -M AndroidManifest.xml -I $ANDROID_JAR -F "$FILE.apk.unaligned" dex
 
 
 zipalign -f 4 "$FILE.apk.unaligned" "$FILE.apk"
 
- ##usa so quando quereia muda a chave##
+ ##usa so quando da erro ou quando quer mudar a chave##
  
 ##keytool -genkeypair -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=BR"
 
