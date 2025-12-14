@@ -1,0 +1,47 @@
+#!/bin/bash
+
+APPNAME=$1
+PACKAGE=$2
+
+mkdir -p $APPNAME/{src,res/{layout,values,drawable},assets,libs}
+
+PKG_PATH=$(echo $PACKAGE | tr '.' '/')
+mkdir -p $APPNAME/src/$PKG_PATH
+
+cat > $APPNAME/AndroidManifest.xml <<EOF
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="$PACKAGE">
+    <uses-sdk android:minSdkVersion="31" android:targetSdkVersion="31" />
+    <application
+        android:label="$APPNAME"
+        android:theme="@android:style/Theme.Material.Light">
+        <activity android:name=".MainActivity"
+                 android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
+EOF
+
+cat > $APPNAME/src/$PKG_PATH/MainActivity.java <<EOF
+package $PACKAGE;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.widget.TextView;
+
+public class MainActivity extends Activity {
+    @Override
+    protected void onCreate(Bundle b) {
+        super.onCreate(b);
+        TextView tv = new TextView(this);
+        tv.setText("Hello World!");
+        setContentView(tv);
+    }
+}
+EOF
+
+echo "Projeto $APPNAME criado."

@@ -1,0 +1,36 @@
+#!/bin/bash
+FILE=$1
+
+if [ -z "$FILE" ]; then
+  echo "Uso: ./build.sh NomeDoApp"
+  exit 1
+fi
+
+ANDROID_JAR=$ANDROID_HOME/platforms/android-31/
+
+mkdir -p out dex
+
+javac  -source 8 -target 8  -bootclasspath $ANDROID_JAR/android.jar -d out $(find src -name "*.java")
+
+jar cf app.jar -C out .
+
+d8 --min-api 31 --output dex app.jar
+
+aapt2 link -o "$FILE.apk.unaligned" --manifest AndroidManifest.xml -I $ANDROID_JAR/android.jar
+
+cp dex/classes.dex .
+zip -u "$FILE.apk.unaligned" classes.dex
+
+##esse e o aapt antigo caso nao funcione o aapt2##
+##aapt package -f -M AndroidManifest.xml -I $ANDROID_JAR -F "$FILE.apk.unaligned" dex
+
+
+zipalign -f 4 "$FILE.apk.unaligned" "$FILE.apk"
+
+ ##usa so quando quereia muda a chave##
+ 
+##keytool -genkeypair -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=BR"
+
+apksigner sign --ks ~/.android/debug.keystore --ks-pass pass:android "$FILE.apk"
+
+echo "APK gerado $FILE.apk"
