@@ -1,36 +1,39 @@
 #!/bin/bash
+set -e
+
 FILE=$1
 
 if [ -z "$FILE" ]; then
-  echo "Uso: ./build.sh NomeDoApp"
+  echo "Uso: ./android-builds NomeDoApp"
   exit 1
 fi
 
-ANDROID_JAR=$ANDROID_HOME/platforms/android-31/
+ANDROID_JAR=$ANDROID_HOME/platforms/android-31/android.jar
 
-mkdir -p out dex
+rm -rf  build out dex
+mkdir -p build out dex
 
-javac  -source 8 -target 8  -bootclasspath $ANDROID_JAR/android.jar -d out $(find src -name "*.java")
+javac  -source 8 -target 8  -bootclasspath $ANDROID_JAR -d out $(find src -name "*.java")
 
-jar cf app.jar -C out .
+cd out
+zip -r ../build/classes.zip .
+cd ..
+d8 --min-api 31 --output dex build/classes.zip
 
-d8 --min-api 31 --output dex app.jar
+aapt2 link -I $ANDROID_JAR --manifest AndroidManifest.xml -o build/$FILE.apk.unaligned
 
-aapt2 link -o "$FILE.apk.unaligned" --manifest AndroidManifest.xml -I $ANDROID_JAR/android.jar
+zip -j build/$FILE.apk.unaligned dex/classes.dex
 
-cp dex/classes.dex .
-zip -u "$FILE.apk.unaligned" classes.dex
-
-##esse e o aapt antigo caso nao funcione o aapt2 desativa [aapt2,cp,zip]##
+##esse e o aapt antigo caso nao funcione o aapt2##
 ##aapt package -f -M AndroidManifest.xml -I $ANDROID_JAR -F "$FILE.apk.unaligned" dex
 
 
-zipalign -f 4 "$FILE.apk.unaligned" "$FILE.apk"
+zipalign -f 4 build/$FILE.apk.unaligned build/$FILE.apk
 
- ##usa so quando da erro ou quando quer mudar a chave##
+ ##usa so quando quereia muda a chave##
  
 ##keytool -genkeypair -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=BR"
 
-apksigner sign --ks ~/.android/debug.keystore --ks-pass pass:android "$FILE.apk"
+apksigner sign --ks ~/.android/debug.keystore --ks-pass pass:android build/$FILE.apk
 
-echo "APK gerado $FILE.apk"
+echo "APK gerado: build/$FILE.apk"
