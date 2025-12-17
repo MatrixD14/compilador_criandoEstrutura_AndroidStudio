@@ -1,118 +1,174 @@
-# 📱 Documentação – Script `android-builds.sh`
+# 📦 o que é, como usa android-init.sh e o android-builds.sh
 
-Este script Bash automatiza **todo o processo de build de um APK Android** sem usar o Android Studio, utilizando diretamente as ferramentas oficiais do SDK Android (`aapt2`, `javac`, `d8`, `zipalign`, `apksigner`).
+Este guia explica **como criar e gerar um APK Android** usando apenas dois scripts Bash, sem Android Studio e sem Gradle.
 
-Ele é ideal para **ambientes Linux**, **Termux**, ou para quem prefere **build manual e controlado**.
+A ideia é bem simples:
 
----
-
-## 📌 Objetivo
-
-Gerar um arquivo **APK assinado (debug)** a partir de um projeto Android em Java, contendo:
-- Recursos (`res/`)
-- Código Java (`src/`)
-- `AndroidManifest.xml`
+1. **`android-init.sh`** → cria a estrutura do projeto
+2. **`android-builds.sh`** → compila e gera o APK
 
 ---
 
-## 📁 Estrutura esperada do projeto
+## 🎯 Objetivo
 
-Antes de executar o script, seu projeto deve estar organizado assim:
+Permitir que qualquer pessoa:
+- Crie um projeto Android em Java
+- Use uma estrutura organizada (core + android)
+- Gere um APK funcional usando apenas scripts
 
+Tudo de forma leve e controlada.
+
+---
+
+## 🧱 Passo 1 – Criar o projeto (`android-init.sh`)
+
+Execute:
+
+```bash
+./android-init.sh
 ```
-projeto/
+
+Informe:
+
+```text
+nome do app: MeuApp
+package ex.: com.exemplo.app: com.exemplo.app
+```
+
+Isso cria um **novo diretório do projeto** com tudo pronto para começar.
+
+---
+
+## 📁 Estrutura de pasta com sera criada
+
+```text
+MeuApp/
 ├── AndroidManifest.xml
-├── res/
-│   ├── layout/
-│   ├── values/
-│   └── drawable/
 ├── src/
-│   └── com/seu/pacote/
-│       └── MainActivity.java
-└── android-builds.sh
+│   └── com/exemplo/app/
+│       ├── core/
+│       │   └── AppCore.java
+│       └── android/
+│           └── MainActivity.java
+├── res/
+│   └── values/
+│       └── strings.xml
+├── assets/
+└── libs/
 ```
+
+### Organização
+
+- **core/** → lógica do app (não depende do Android)
+- **android/** → interface e código específico da plataforma
 
 ---
 
-## ⚙️ Requisitos
+## 🧠 O que o projeto inicial já faz
 
-### Ferramentas necessárias
+- Define o **package** corretamente
+- Cria o **AndroidManifest.xml** básico
+- Gera uma `MainActivity`
+- Cria uma classe `AppCore` separada da UI
+- Mostra um app funcional com botão e contador
 
-Certifique-se de que estas ferramentas estão instaladas e acessíveis no `PATH`:
-
-- `aapt2`
-- `javac` (Java 8)
-- `d8`
-- `zipalign`
-- `apksigner`
-- `keytool`
-
-### Variáveis de ambiente
-
-A variável abaixo **deve estar configurada**:
-
-```bash
-ANDROID_HOME=/caminho/do/Android/Sdk
-```
-
-E o Android 31 deve existir:
-
-```
-$ANDROID_HOME/platforms/android-31/android.jar
-```
+A interface é feita **diretamente em Java**, sem XML.
 
 ---
 
-## ▶️ Como usar
+## 🧩 Separação de responsabilidades
 
-1. Dê permissão de execução:
+### AppCore (lógica)
 
-```bash
-chmod +x android-builds.sh
-```
+- Não depende de Android
+- Pode ser reutilizado ou testado isoladamente
+- Controla o estado do app (ex: contador)
 
-2. Execute o script:
+### MainActivity (UI)
+
+- Cria a interface
+- Chama o core quando o usuário interage
+
+Essa separação facilita manutenção e evolução do projeto.
+
+---
+
+## 🛠️ Passo 2 – Gerar o APK (`android-builds.sh`)
+
+Dentro da pasta do projeto, execute:
 
 ```bash
 ./android-builds.sh
 ```
 
-3. Informe o nome do APK quando solicitado:
+Informe:
 
 ```text
 nome do apk: MeuApp
 ```
 
-📦 APK final:
+---
 
-```
+## 📦 Resultado
+
+Ao final do processo:
+
+```text
 build/apk/MeuApp.apk
 ```
 
----
+O APK:
+- Já está alinhado
+- Já está assinado (debug)
+- Já pode ser instalado
 
-## ✅ Resultado final
+## 🔗‍️ Como connect e instala o apk o adb no dispositivo
 
-```text
-APK gerado: build/apk/NomeDoApp.apk
+```pair
+adb pair ip:port codigo
 ```
-
-Pronto para instalar com:
+- o ip:port e o codigo voce acha no **depuração por wifi** no dispositivo, tem que clica no **parear dispositivo**
+  
+```connected
+adb connect ip:port
+```
+- o ip:port voce acha no **depuração por wifi** no dispositivo na tela de inicio dela, vai esta mais ou menos assim **123.456.78.90:12345**
 
 ```bash
-adb install NomeDoApp.apk
+adb install MeuApp.apk
 ```
 
 ---
 
-## 🚀 Observações finais
+## 🔁 Fluxo resumido
 
-- Ideal para **builds manuais**, **CI**, **Termux**
-- Não depende de Gradle
-- Fácil de adaptar para release
+```text
+android-init.sh
+        ↓
+Projeto criado
+        ↓
+Editar código (opcional)
+        ↓
+android-builds.sh
+        ↓
+APK pronto
+```
 
-Se quiser, posso:
-- Adaptar para **APK release**
-- Converter para **script interativo**
-- Criar versão com **logs detalhados**
-- Ajustar para **outras APIs Android**
+---
+
+## ⚠️ Observações importantes
+
+- É necessário ter o **Android SDK configurado**
+- A variável `ANDROID_HOME` deve estar definida
+- O projeto usa **API 31**
+- O APK gerado é **debug**
+- link do youtube, como baixa e configura: https://youtu.be/2cvwXCd3htc?si=EXSPRUPv71FWQqMk
+
+---
+
+## 🚀 Para quem este fluxo é ideal
+
+- Quem quer aprender Android por baixo dos panos
+- Quem usa **Linux / Termux**
+- Quem prefere controle total do build
+- **Quem não quer depender de Gradle, compilador pesado**
