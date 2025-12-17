@@ -138,6 +138,11 @@ adb connect ip:port
 adb install MeuApp.apk
 ```
 
+
+❗e mais o meno como esta no video, mais seria pc conecta no dispositivo, os comandos vai ser no pc ❗
+  
+  link: https://youtu.be/APolZrPHSms?si=alNwfnL0FddGzTaV
+  
 ---
 
 ## 🔁 Fluxo resumido
