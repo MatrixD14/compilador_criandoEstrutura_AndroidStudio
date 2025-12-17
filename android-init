@@ -1,7 +1,9 @@
 #!/bin/bash
+read -p "nome do app: " APPNAME
+read -p "package ex.: com.exemplo.app: " PACKAGE
 
-APPNAME=$1
-PACKAGE=$2
+echo "nome do app: $APPNAME"
+echo "package: $PACKGE"
 
 if [ -z "$APPNAME" ] || [ -z "$PACKAGE" ]; then
   echo "Uso: ./android-init NomeApp com.exemplo.app"
