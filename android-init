@@ -25,6 +25,11 @@ cat > $APPNAME/AndroidManifest.xml <<EOF
     <uses-sdk
         android:minSdkVersion="31"
         android:targetSdkVersion="31"/>
+
+   <!-- para adiciona icon do app vai na pasta res/mipmap-xxxhdpi/ e adicione-->
+   <!-- o icon como o tamanho minimo 96x96 para cima-->
+   <!-- e adiciona a dentro da tag <application android:icon="@mipmap/image" ...-->
+
     <application
         android:label="@string/app_name"
         android:debuggable="true" 
