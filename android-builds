@@ -29,19 +29,19 @@ aapt2 link -I $ANDROID_JAR --manifest AndroidManifest.xml --java $BUILD -o $AAPT
 echo "__compilado_java__"
 javac  -source 8 -target 8  -bootclasspath $ANDROID_JAR -d $CLASSES $(find src -name "*.java") $(find $BUILD -name "R.java")
 
-echo "__empacotando_tudo__"
-cd $CLASSES
-zip -r classes.zip .
-cd ..
+#echo "__empacotando_tudo__"
+#cd $CLASSES
+#zip -r classes.zip .
+#cd ..
 
 echo "__criando_classes.dex__"
-d8 --min-api 31 --output $DEX $CLASSES/classes.zip
+d8 --min-api 31 --output $DEX $(find $CLASSES -name "*.class")
 
 echo "__insertiro_classes.zip_no_apk__"
-zip -j $AAPT/$FILE.apk.unaligned $DEX/classes.dex
+zip -j $AAPT/link.apk $DEX/classes.dex
 
 echo "__zipaling__"
-zipalign -f 4 $AAPT/$FILE.apk.unaligned $APK/$FILE.apk
+zipalign -f 4 $AAPT/link.apk $APK/$FILE.apk
 
  ##sera usando quando nao tiver file debug.keystore##
 if [ ! -f ~/.android/debug.keystore ]; then
@@ -52,4 +52,5 @@ fi
 echo "__assinando_apk__"
 apksigner sign --ks ~/.android/debug.keystore --ks-pass pass:android $APK/$FILE.apk
 
+echo
 echo "APK gerado: $APK/$FILE.apk"

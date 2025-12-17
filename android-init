@@ -25,7 +25,7 @@ cat > $APPNAME/AndroidManifest.xml <<EOF
         android:minSdkVersion="31"
         android:targetSdkVersion="31"/>
     <application
-        android:label="$APPNAME"
+        android:label="@string/app_name"
         android:debuggable="true" 
         android:allowBackup="true"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
