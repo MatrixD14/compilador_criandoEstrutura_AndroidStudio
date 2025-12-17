@@ -3,7 +3,7 @@ read -p "nome do app: " APPNAME
 read -p "package ex.: com.exemplo.app: " PACKAGE
 
 echo "nome do app: $APPNAME"
-echo "package: $PACKGE"
+echo "package: $PACKAGE"
 
 if [ -z "$APPNAME" ] || [ -z "$PACKAGE" ]; then
   echo "Uso: ./android-init NomeApp com.exemplo.app"
@@ -13,7 +13,8 @@ fi
 PKG_PATH=$(echo $PACKAGE | tr '.' '/')
 
 mkdir -p $APPNAME/src/$PKG_PATH/{core,android}
-mkdir -p $APPNAME/{res/{drawable,layout,values},assets,libs}
+mkdir -p $APPNAME/res/{drawable,layout,values,mipmap-xxxhdpi}
+mkdir -p $APPNAME/{assets,libs}
 
 cat > $APPNAME/AndroidManifest.xml <<EOF
 <?xml version="1.0" encoding="utf-8"?>
