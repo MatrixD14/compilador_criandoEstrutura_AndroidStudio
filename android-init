@@ -6,9 +6,16 @@ echo "nome do app: $APPNAME"
 echo "package: $PACKAGE"
 
 if [ -z "$APPNAME" ] || [ -z "$PACKAGE" ]; then
-  echo "Uso: ./android-init NomeApp com.exemplo.app"
+  echo "nome do app: NomeApp"
+  echo "package: com.exemplo.app"
   exit 1
 fi
+if [ -d "$APPNAME" ]; then
+  echo "Diretorio já existe"
+  exit 1
+fi
+
+cd $APPNAME
 
 PKG_PATH=$(echo $PACKAGE | tr '.' '/')
 
