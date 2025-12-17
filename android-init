@@ -2,26 +2,26 @@
 read -p "nome do app: " APPNAME
 read -p "package ex.: com.exemplo.app: " PACKAGE
 
-echo "nome do app: $APPNAME"
-echo "package: $PACKAGE"
-
 if [ -z "$APPNAME" ] || [ -z "$PACKAGE" ]; then
+  echo
   echo "nome do app: NomeApp"
   echo "package: com.exemplo.app"
   exit 1
 fi
 if [ -d "$APPNAME" ]; then
+  echo
   echo "Diretorio já existe"
   exit 1
 fi
 
-cd $APPNAME
 
 PKG_PATH=$(echo $PACKAGE | tr '.' '/')
 
 mkdir -p $APPNAME/src/$PKG_PATH/{core,android}
 mkdir -p $APPNAME/res/{drawable,layout,values,mipmap-xxxhdpi}
 mkdir -p $APPNAME/{assets,libs}
+
+cd $APPNAME
 
 cat > $APPNAME/AndroidManifest.xml <<EOF
 <?xml version="1.0" encoding="utf-8"?>
