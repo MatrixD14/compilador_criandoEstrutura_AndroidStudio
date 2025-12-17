@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-FILE=$1
+read -p "nome do apk: " FILE
 
 if [ -z "$FILE" ]; then
   echo "Uso: ./android-builds NomeDoApp"
@@ -10,30 +10,46 @@ fi
 
 ANDROID_JAR=$ANDROID_HOME/platforms/android-31/android.jar
 
-rm -rf  build out dex
-mkdir -p build out dex
+BUILD=build
+AAPT=$BUILD/aapt
+CLASSES=$BUILD/classes
+DEX=$BUILD/dex
+APK=$BUILD/apk
 
-javac  -source 8 -target 8  -bootclasspath $ANDROID_JAR -d out $(find src -name "*.java")
+echo "__clear_build__"
+rm -rf $BUILD
+mkdir -p $AAPT $CLASSES $DEX $APK
 
-cd out
-zip -r ../build/classes.zip .
+echo "__aapt2_Compila__"
+aapt2 compile --dir res -o $AAPT/resources.zip
+
+echo "__gerando_link e R.java__"
+aapt2 link -I $ANDROID_JAR --manifest AndroidManifest.xml --java $BUILD -o $AAPT/link.apk $AAPT/resources.zip --auto-add-overlay
+
+echo "__compilado_java__"
+javac  -source 8 -target 8  -bootclasspath $ANDROID_JAR -d $CLASSES $(find src -name "*.java") $(find $BUILD -name "R.java")
+
+echo "__empacotando_tudo__"
+cd $CLASSES
+zip -r classes.zip .
 cd ..
-d8 --min-api 31 --output dex build/classes.zip
 
-aapt2 link -I $ANDROID_JAR --manifest AndroidManifest.xml -o build/$FILE.apk.unaligned
+echo "__criando_classes.dex__"
+d8 --min-api 31 --output $DEX $CLASSES/classes.zip
 
-zip -j build/$FILE.apk.unaligned dex/classes.dex
+echo "__insertiro_classes.zip_no_apk__"
+zip -j $AAPT/$FILE.apk.unaligned $DEX/classes.dex
 
-##esse e o aapt antigo caso nao funcione o aapt2##
-##aapt package -f -M AndroidManifest.xml -I $ANDROID_JAR -F "$FILE.apk.unaligned" dex
+echo "__zipaling__"
+zipalign -f 4 $AAPT/$FILE.apk.unaligned $APK/$FILE.apk
 
+ ##sera usando quando nao tiver file debug.keystore##
+if [ ! -f ~/.android/debug.keystore ]; then
+   echo "__criando_chave_debug__"
+ keytool -genkeypair -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=BR"
+fi
 
-zipalign -f 4 build/$FILE.apk.unaligned build/$FILE.apk
+echo "__assinando_apk__"
+apksigner sign --ks ~/.android/debug.keystore --ks-pass pass:android $APK/$FILE.apk
 
- ##usa so quando quereia muda a chave##
- 
-##keytool -genkeypair -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=BR"
-
-apksigner sign --ks ~/.android/debug.keystore --ks-pass pass:android build/$FILE.apk
-
-echo "APK gerado: build/$FILE.apk"
+echo "APK gerado: $APK/$FILE.apk"
