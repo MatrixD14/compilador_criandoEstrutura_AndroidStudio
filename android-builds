@@ -21,10 +21,10 @@ rm -rf $BUILD
 mkdir -p $AAPT $CLASSES $DEX $APK
 
 echo "__aapt2_Compila__"
-aapt2 compile --dir res -o $AAPT/resources.zip
+aapt2 compile -v --dir res -o $AAPT/resources.zip
 
 echo "__gerando_link e R.java__"
-aapt2 link -I $ANDROID_JAR --manifest AndroidManifest.xml --java $BUILD -o $AAPT/link.apk $AAPT/resources.zip --auto-add-overlay
+aapt2 link -v -I $ANDROID_JAR --manifest AndroidManifest.xml --java $BUILD -o $AAPT/link.apk $AAPT/resources.zip --auto-add-overlay
 
 echo "__compilado_java__"
 javac  -source 8 -target 8  -bootclasspath $ANDROID_JAR -d $CLASSES $(find src -name "*.java") $(find $BUILD -name "R.java")
