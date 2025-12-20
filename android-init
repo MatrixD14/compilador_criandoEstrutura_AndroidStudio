@@ -1,6 +1,8 @@
 #!/bin/bash
-read -p "nome do app: " APPNAME
-read -p "package ex.: com.exemplo.app: " PACKAGE
+#read -p "nome do app: " APPNAME
+#read -p "package ex.: com.exemplo.app: " PACKAGE
+APPNAME=$1
+PACKAGE=$2
 
 if [ -z "$APPNAME" ] || [ -z "$PACKAGE" ]; then
   echo
