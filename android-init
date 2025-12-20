@@ -1,14 +1,21 @@
 #!/bin/bash
-#read -p "nome do app: " APPNAME
-#read -p "package ex.: com.exemplo.app: " PACKAGE
-APPNAME=$1
-PACKAGE=$2
+#read -p "package (ex.: com.exemplo.app): " PACKAGE
+PACKAGE=$1
 
-if [ -z "$APPNAME" ] || [ -z "$PACKAGE" ]; then
-  echo
-  echo "nome do app ou package, estão vazio rode de novo o android-init"
+if [ -z "$PACKAGE" ]; then
+  echo "Erro: Informe o pacote (ex: com.exemplo.app)"
   exit 1
 fi
+
+APPNAME=$(echo $PACKAGE | cut -d'.' -f2)
+
+if [ -z "$APPNAME" ] || [ "$APPNAME" == "$PACKAGE" ]; then
+    APPNAME=$(echo $PACKAGE | cut -d'.' -f1)
+fi
+
+echo "Iniciando projeto: $APPNAME"
+echo "Package: $PACKAGE"
+
 if [ -d "$APPNAME" ]; then
   echo
   echo "Diretorio já existe"
