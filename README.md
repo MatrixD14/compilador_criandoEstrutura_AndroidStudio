@@ -25,7 +25,7 @@ Tudo de forma leve e controlada.
 Execute:
 
 ```bash
-./android-init.sh
+./android-init.sh MeuApp com.exemplo.app
 ```
 
 Informe:
@@ -100,13 +100,7 @@ Dentro da pasta do projeto, execute:
 ```bash
 ./android-builds.sh
 ```
-
-Informe:
-
-```text
-nome do apk: MeuApp
-```
-
+- ele vai pega o nome a pasta automaticamente
 ---
 
 ## 📦 Resultado
@@ -114,7 +108,7 @@ nome do apk: MeuApp
 Ao final do processo:
 
 ```text
-build/apk/MeuApp.apk
+build/apk/NomePath.apk
 ```
 
 O APK:
