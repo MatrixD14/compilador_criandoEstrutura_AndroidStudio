@@ -3,10 +3,10 @@ set -e
 
 FILE=$(basename "$(pwd)")
 
-echo "📦 Iniciando build do projeto: $FILE"
+echo "Iniciando build do projeto: $FILE"
 
 if [ -z "$FILE" ]; then
-  echo "❌ Erro: Não foi possível determinar o nome da pasta."
+  echo "Erro: Não foi possível determinar o nome da pasta."
   exit 1
 fi
 
