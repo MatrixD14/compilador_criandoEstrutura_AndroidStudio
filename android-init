@@ -1,5 +1,135 @@
 #!/bin/bash
 #read -p "package (ex.: com.exemplo.app): " PACKAGE
+
+#para nao dar erro quando for compilar não user caracteres especias ou emoji !nenhum! como, (ex.: ( , # $ @ ! % " & * { [ / ; ✅ ❌ ...), como deve ser, letra minúscula ou maiúcula (ex.: Com.Exemplo.App, com.exemplo.app, Com.exemplo.app, COM.EXEMPLO.APP)
+#read -p "package (ex.: com.exemplo.app): " PACKAGE
+PACKAGE=$1
+
+if [ -z "$PACKAGE" ]; then
+  echo "Erro: Informe o pacote (ex: com.exemplo.app)"
+  exit 1
+fi
+
+APPNAME=$(echo $PACKAGE | cut -d'.' -f2)
+
+if [ -z "$APPNAME" ] || [ "$APPNAME" == "$PACKAGE" ]; then
+    APPNAME=$(echo $PACKAGE | cut -d'.' -f1)
+fi
+
+echo "Iniciando projeto: $APPNAME"
+echo "Package: $PACKAGE"
+
+if [ -d "$APPNAME" ]; then
+  echo
+  echo "Diretorio já existe"
+  exit 1
+fi
+
+PKG_PATH=$(echo $PACKAGE | tr '.' '/')
+
+mkdir -p $APPNAME/src/$PKG_PATH/{core,android}
+mkdir -p $APPNAME/res/{drawable,layout,values,mipmap-xxxhdpi}
+mkdir -p $APPNAME/{assets,libs}
+
+cat > $APPNAME/AndroidManifest.xml <<EOF
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="$PACKAGE"
+    android:versionCode="1"
+    android:versionName="1.0">
+    <uses-sdk
+        android:minSdkVersion="31"
+        android:targetSdkVersion="31"/>
+
+   <!-- para adiciona icon no apk do app vai na pasta res/mipmap-xxxhdpi/ e adicione
+        o icon como o tamanho minimo 96x96 para cima e adiciona a dentro da tag 
+        <application android:icon="@mipmap/image">...</application> -->
+
+    <application
+        android:label="@string/app_name"
+        android:debuggable="true" 
+        android:allowBackup="true"
+        android:theme="@android:style/Theme.Material.Light.NoActionBar">
+        <activity android:name=".android.MainActivity"
+                 android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
+EOF
+
+cat > $APPNAME/src/$PKG_PATH/core/AppCore.java <<EOF
+package $PACKAGE.core;
+
+public class AppCore {
+
+    private int counter = 0;
+
+    public String click() {
+        counter++;
+        return "Cliques: " + counter;
+    }
+}
+EOF
+
+cat > $APPNAME/src/$PKG_PATH/android/MainActivity.java <<EOF
+package $PACKAGE.android;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import $PACKAGE.core.AppCore;
+
+public class MainActivity extends Activity {
+
+    private AppCore core = new AppCore();
+
+    @Override
+    protected void onCreate(Bundle b) {
+        super.onCreate(b);
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setGravity(Gravity.CENTER);
+
+        TextView tv = new TextView(this);
+        tv.setText("Cliques: 0");
+
+        Button bt = new Button(this);
+        bt.setText("Clicar");
+
+        bt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tv.setText(core.click());
+            }
+        });
+
+        layout.addView(tv);
+        layout.addView(bt);
+
+        setContentView(layout);
+    }
+}
+EOF
+
+cat > $APPNAME/res/values/strings.xml <<EOF
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">$APPNAME</string>
+</resources>
+EOF
+
+
+echo "Projeto $APPNAME criado com core multiplataforma"
 PACKAGE=$1
 
 if [ -z "$PACKAGE" ]; then
