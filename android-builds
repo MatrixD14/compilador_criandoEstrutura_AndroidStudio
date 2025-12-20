@@ -31,11 +31,6 @@ aapt2 link -v -I $ANDROID_JAR --manifest ./AndroidManifest.xml --java $BUILD -o 
 echo "__compilado_java__"
 javac  -source 8 -target 8  -bootclasspath $ANDROID_JAR -d $CLASSES $(find src -name "*.java") $(find $BUILD -name "R.java")
 
-#echo "__empacotando_tudo__"
-#cd $CLASSES
-#zip -r classes.zip .
-#cd ..
-
 echo "__criando_classes.dex__"
 d8 --min-api 31 --output $DEX $(find $CLASSES -name "*.class")
 
